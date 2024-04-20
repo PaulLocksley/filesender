@@ -51,7 +51,8 @@ class FileTest extends CommonDatabaseTestCase {
      * Init variables, first function called
      */
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         echo "FileTest@ " . date("Y-m-d H:i:s") . "\n\n";
 
         $this->transferSubject = "Subject test";
@@ -85,9 +86,9 @@ class FileTest extends CommonDatabaseTestCase {
 
         // uploading fake file
         $dest = rtrim(Config::get('storage_filesystem_path'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        copy($this->srcFile, $dest . $file->uid);
-
-        $this->displayInfo(get_class($this), __FUNCTION__, ' -- File created:'.$file->id);
+        StorageFilesystem::ensurePath( $dest, Storage::buildPath($file, false));
+        copy($this->srcFile, Storage::buildPath($file) . "/" . $file->uid);
+        $this->displayInfo(get_class($this), __FUNCTION__, ' -- File created:'.$file->id.' dest:'.$dest.' uuid:'.$file->uid.' subp:'.Storage::buildPath($file));
 
         return $file->id;
     }
@@ -163,7 +164,7 @@ class FileTest extends CommonDatabaseTestCase {
      * 
      * @depends testUpdate
      * @return int: $file->id if test succeed
-     */
+     */    
     public function testStorage($fileId) {
         $this->assertTrue($fileId > 0);
 
@@ -177,7 +178,8 @@ class FileTest extends CommonDatabaseTestCase {
 
         return $fileId;
     }
-
+ 
+    
     /**
      * Function used to test deletion of a file from database
      * 
